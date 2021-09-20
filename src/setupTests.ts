@@ -1,5 +1,15 @@
-// jest-dom adds custom jest matchers for asserting on DOM nodes.
-// allows you to do things like:
-// expect(element).toHaveTextContent(/react/i)
-// learn more: https://github.com/testing-library/jest-dom
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
+import fetchMock from "jest-fetch-mock";
+import {queryClient} from "./context";
+import {act, waitFor} from "@testing-library/react";
+
+fetchMock.enableMocks();
+
+afterEach(async () => {
+    queryClient.removeQueries();
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0));
+    if (jest.isMockFunction(setTimeout)) {
+        act(() => (jest as any).runOnlyPendingTimers());
+        jest.useRealTimers();
+    }
+});
